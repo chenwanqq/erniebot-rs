@@ -1,4 +1,5 @@
-use url::{Url,ParseError};
+use super::model::ChatModel;
+use url::{ParseError, Url};
 
 static CHAT_API_URL: &'static str =
     "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
@@ -9,7 +10,11 @@ fn build_url(model: &str) -> Result<Url, ParseError> {
     Ok(joined)
 }
 
-
+//TODO: finish this
+struct Chat {
+    url: Url,
+    access_token: String,
+}
 
 #[cfg(test)]
 mod tests {
@@ -19,6 +24,12 @@ mod tests {
     #[test]
     fn test_build_url() {
         let url = build_url("completions_pro").unwrap();
-        assert_eq!(url, Url::parse("https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro").unwrap());
+        assert_eq!(
+            url,
+            Url::parse(
+                "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro"
+            )
+            .unwrap()
+        );
     }
 }
