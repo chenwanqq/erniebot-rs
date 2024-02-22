@@ -1,34 +1,32 @@
-use std::{error,fmt};
+use std::{error, fmt};
+use thiserror::Error;
 //TODO: use this error to replace all below
-#[derive(Debug)]
-pub struct GetAccessTokenError {
-    details: String
+#[derive(Error, Debug)]
+pub enum GetAccessTokenError {
+    #[error("GetAccessTokenError: {0}")]
+    Details(String),
 }
 
-impl fmt::Display for GetAccessTokenError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.details)
-    }
+#[derive(Error, Debug)]
+pub enum GetResponseError {
+    #[error("GetResponseError: {0}")]
+    Details(String),
 }
 
-impl GetAccessTokenError {
-    pub fn new(msg: &str) -> GetAccessTokenError {
-        GetAccessTokenError{details: msg.to_string()}
-    }
+#[derive(Error, Debug)]
+pub enum ChatError {
+    #[error("GetResponseError: {0}")]
+    Response(#[from] GetResponseError),
+    #[error("InvokeError: {0}")]
+    InvokeError(String),
+    #[error("StreamError: {0}")]
+    StreamError(String),
+    #[error("GetAccessTokenError: {0}")]
+    GetAccessTokenError(#[from] GetAccessTokenError),
+    #[error("BuildUrlError: {0}")]
+    BuildUrlError(#[from] url::ParseError),
+    #[error("GenerateBodyError: {0}")]
+    GenerateBodyError(String),
+    #[error("RemoteAPIError: {0}")]
+    RemoteAPIError(String),
 }
-
-impl error::Error for GetAccessTokenError {}
-
-pub struct GetResultError {
-    details: String
-}
-
-impl fmt::Display for GetResultError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.details)
-    }
-}
-
-
-
-

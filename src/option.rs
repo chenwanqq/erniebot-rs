@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all(serialize="snake_case", deserialize="snake_case"))]
 pub enum ResponseFormat {
     JsonObject,
     Text,
