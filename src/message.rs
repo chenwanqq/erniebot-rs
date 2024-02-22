@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
-use serde_json::to_string;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-struct Message {
+pub struct Message {
     role: String,
     content: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -11,7 +10,7 @@ struct Message {
 #[cfg(test)]
 mod tests {
     use super::Message;
-    use serde_json::to_string;
+    use serde_json::{to_string, self};
     #[test]
     fn test_message() {
         let message1 = Message {
@@ -34,7 +33,3 @@ mod tests {
         println!("{}", messages_str);
     }
 }
-
-
-
-

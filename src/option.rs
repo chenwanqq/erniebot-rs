@@ -1,10 +1,5 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Default, Clone, Serialize, Deserialize, PartialEq)]
-pub struct Options {
-    opts: Vec<Opt>,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ResponseFormat {
     JsonObject,
@@ -20,9 +15,11 @@ impl ToString for ResponseFormat {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all(serialize="snake_case", deserialize="snake_case"))]
 pub enum Opt {
     Temperature(f32),
     TopP(f32),
+    TopK(u32),
     PenaltyScore(f32),
     Stream(bool),
     System(String),
