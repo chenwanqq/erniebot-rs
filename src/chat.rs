@@ -1,11 +1,12 @@
 use super::errors::ChatError;
-use super::message::{Message,Role};
+use super::message::{Message, Role};
 use super::model::ChatModel;
 use super::option::Opt;
-use super::response::Response;
-use json_value_merge::Merge;
-use serde_json::Value;
+use super::response::{Response, StreamResponse};
 use super::utils::get_access_token;
+use json_value_merge::Merge;
+use reqwest_streams::*;
+use serde_json::Value;
 use url::{ParseError, Url};
 
 static CHAT_API_URL: &'static str =
@@ -46,6 +47,7 @@ impl Chat {
     fn generate_body(
         messages: Vec<Message>,
         options: Vec<Opt>,
+        stream: bool,
     ) -> Result<serde_json::Value, ChatError> {
         let mut body = serde_json::json!({
             "messages": messages,
@@ -60,17 +62,16 @@ impl Chat {
         for opt in options_array {
             body.merge(&opt);
         }
+        if stream {
+            body.merge(&serde_json::json!({"stream": true}));
+        }
         Ok(body)
     }
-    
-    pub fn invoke(
-        &self,
-        messages: Vec<Message>,
-        options: Vec<Opt>,
-    ) -> Result<Response, ChatError> {
-        let body = Chat::generate_body(messages, options)?;
+
+    pub fn invoke(&self, messages: Vec<Message>, options: Vec<Opt>) -> Result<Response, ChatError> {
+        let body = Chat::generate_body(messages, options, false)?;
         let client = reqwest::blocking::Client::new();
-        let response:Value = client
+        let response: Value = client
             .post(self.url.as_str())
             .header("Content-Type", "application/json")
             .query(&[("access_token", self.access_token.as_str())])
@@ -79,30 +80,46 @@ impl Chat {
             .map_err(|e| ChatError::InvokeError(e.to_string()))?
             .json()
             .map_err(|e| ChatError::InvokeError(e.to_string()))?;
-        
+
         //if error_code key in response, means RemoteAPIError
         if response.get("error_code").is_some() {
             return Err(ChatError::RemoteAPIError(response.to_string()));
         }
         Ok(Response::new(response))
     }
-    
+    pub fn stream(
+        &self,
+        messages: Vec<Message>,
+        options: Vec<Opt>,
+    ) -> Result<StreamResponse, ChatError> {
+        let body = Chat::generate_body(messages, options, true)?;
+        let client = reqwest::blocking::Client::new();
+        let response = client
+            .post(self.url.as_str())
+            .header("Content-Type", "application/json")
+            .query(&[("access_token", self.access_token.as_str())])
+            .json(&body)
+            .send()
+            .map_err(|e| ChatError::StreamError(e.to_string()))?
+            .text()
+            .map_err(|e| ChatError::StreamError(e.to_string()))?;
+        let response = StreamResponse::from_text(response)?;
+        Ok(response)
+    }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Chat, Message, Opt,Role};
+    use super::{Chat, Message, Opt, Role};
     #[test]
     fn test_generate_body() {
-        let messages = vec![
-            Message {
-                role: Role::User,
-                content: "hello, I'm a user".to_string(),
-                name: None,
-            },
-        ];
+        let messages = vec![Message {
+            role: Role::User,
+            content: "hello, I'm a user".to_string(),
+            name: None,
+        }];
         let options = vec![Opt::Temperature(0.5), Opt::TopP(0.5), Opt::TopK(50)];
-        let result = Chat::generate_body(messages, options).unwrap();
+        let result = Chat::generate_body(messages, options, true).unwrap();
         let s = serde_json::to_string(&result).unwrap();
         println!("{}", s);
     }
@@ -121,5 +138,23 @@ mod tests {
         let response = chat.invoke(messages, options).unwrap();
         let result = response.get_result().unwrap();
         println!("{}", result);
+    }
+
+    #[test]
+    fn test_stream() {
+        let chat = Chat::new(crate::model::ChatModel::ErnieBotTurbo).unwrap();
+        let messages = vec![
+            Message {
+                role: Role::User,
+                content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using stream method".to_string(),
+                name: None,
+            },
+        ];
+        let options = vec![Opt::Temperature(0.5), Opt::TopP(0.5), Opt::TopK(50)];
+        let response = chat.stream(messages, options).unwrap();
+        let result_by_chunk = response.get_results().unwrap();
+        println!("{:?}", result_by_chunk);
+        let whole_result = response.get_whole_result().unwrap();
+        println!("{}", whole_result);
     }
 }

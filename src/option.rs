@@ -22,7 +22,6 @@ pub enum Opt {
     TopP(f32),
     TopK(u32),
     PenaltyScore(f32),
-    Stream(bool),
     System(String),
     Stop(Vec<String>),
     DisableSearch(bool),
