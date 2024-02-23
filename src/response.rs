@@ -19,6 +19,14 @@ impl Response {
         &self.raw_response
     }
 
+    pub fn get(&self, key: &str) -> Option<&value::Value> {
+        self.raw_response.get(key)
+    }
+
+    pub fn get_mut(&mut self, key: &str) -> Option<&mut value::Value> {
+        self.raw_response.get_mut(key)
+    }
+
     pub fn get_result(&self) -> Result<String, GetResponseError> {
         match self.raw_response.get("result") {
             Some(result) => match result.as_str() {
