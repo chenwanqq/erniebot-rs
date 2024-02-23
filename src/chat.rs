@@ -1,11 +1,11 @@
 use crate::message;
 
-use super::errors::ChatError;
+use super::errors::ErnieError;
 use super::message::{Message, Role};
 use super::model::ChatModel;
 use super::option::Opt;
 use super::response::{Response, Responses, StreamResponse};
-use super::utils::get_access_token;
+use super::utils::{build_url, get_access_token};
 use json_value_merge::Merge;
 use reqwest_eventsource::{Event, EventSource, RequestBuilderExt};
 use serde_json::Value;
@@ -24,25 +24,18 @@ struct Chat {
 }
 
 impl Chat {
-    /// Build the url for the chat model
-    fn build_url(url: &str, model: &str) -> Result<Url, ChatError> {
-        let base = Url::parse(url)?;
-        let joined = base.join(model)?;
-        Ok(joined)
-    }
-
     /// create a new chat instance using pre-defined model
-    pub fn new(model: ChatModel) -> Result<Self, ChatError> {
+    pub fn new(model: ChatModel) -> Result<Self, ErnieError> {
         Ok(Chat {
-            url: Chat::build_url(CHAT_API_URL, model.to_string().as_str())?,
+            url: build_url(CHAT_API_URL, model.to_string().as_str())?,
             access_token: get_access_token()?,
         })
     }
 
     /// create a new chat instance using custom model release on https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{custom_endpoint}
-    pub fn new_with_custom_endpoint(endpoint: &str) -> Result<Self, ChatError> {
+    pub fn new_with_custom_endpoint(endpoint: &str) -> Result<Self, ErnieError> {
         Ok(Chat {
-            url: Chat::build_url(CUSTOM_API_URL, endpoint)?,
+            url: build_url(CUSTOM_API_URL, endpoint)?,
             access_token: get_access_token()?,
         })
     }
@@ -51,13 +44,13 @@ impl Chat {
         messages: Vec<Message>,
         options: Vec<Opt>,
         stream: bool,
-    ) -> Result<serde_json::Value, ChatError> {
+    ) -> Result<serde_json::Value, ErnieError> {
         let mut body = serde_json::json!({
             "messages": messages,
         });
         let options_array = serde_json::json!(options).as_array().cloned();
         if options_array.is_none() {
-            return Err(ChatError::GenerateBodyError(
+            return Err(ErnieError::GenerateBodyError(
                 "options is not valid".to_string(),
             ));
         }
@@ -71,7 +64,11 @@ impl Chat {
         Ok(body)
     }
 
-    pub fn invoke(&self, messages: Vec<Message>, options: Vec<Opt>) -> Result<Response, ChatError> {
+    pub fn invoke(
+        &self,
+        messages: Vec<Message>,
+        options: Vec<Opt>,
+    ) -> Result<Response, ErnieError> {
         let body = Chat::generate_body(messages, options, false)?;
         let client = reqwest::blocking::Client::new();
         let response: Value = client
@@ -80,13 +77,13 @@ impl Chat {
             .query(&[("access_token", self.access_token.as_str())])
             .json(&body)
             .send()
-            .map_err(|e| ChatError::InvokeError(e.to_string()))?
+            .map_err(|e| ErnieError::InvokeError(e.to_string()))?
             .json()
-            .map_err(|e| ChatError::InvokeError(e.to_string()))?;
+            .map_err(|e| ErnieError::InvokeError(e.to_string()))?;
 
         //if error_code key in response, means RemoteAPIError
         if response.get("error_code").is_some() {
-            return Err(ChatError::RemoteAPIError(response.to_string()));
+            return Err(ErnieError::RemoteAPIError(response.to_string()));
         }
         Ok(Response::new(response))
     }
@@ -94,7 +91,7 @@ impl Chat {
         &self,
         messages: Vec<Message>,
         options: Vec<Opt>,
-    ) -> Result<Responses, ChatError> {
+    ) -> Result<Responses, ErnieError> {
         let body = Chat::generate_body(messages, options, true)?;
         let client = reqwest::blocking::Client::new();
         let response = client
@@ -103,9 +100,9 @@ impl Chat {
             .query(&[("access_token", self.access_token.as_str())])
             .json(&body)
             .send()
-            .map_err(|e| ChatError::StreamError(e.to_string()))?
+            .map_err(|e| ErnieError::StreamError(e.to_string()))?
             .text()
-            .map_err(|e| ChatError::StreamError(e.to_string()))?;
+            .map_err(|e| ErnieError::StreamError(e.to_string()))?;
         let response = Responses::from_text(response)?;
         Ok(response)
     }
@@ -114,7 +111,7 @@ impl Chat {
         &self,
         messages: Vec<Message>,
         options: Vec<Opt>,
-    ) -> Result<Response, ChatError> {
+    ) -> Result<Response, ErnieError> {
         let body = Chat::generate_body(messages, options, false)?;
         let client = reqwest::Client::new();
         let response: Value = client
@@ -124,14 +121,14 @@ impl Chat {
             .json(&body)
             .send()
             .await
-            .map_err(|e| ChatError::InvokeError(e.to_string()))?
+            .map_err(|e| ErnieError::InvokeError(e.to_string()))?
             .json()
             .await
-            .map_err(|e| ChatError::InvokeError(e.to_string()))?;
+            .map_err(|e| ErnieError::InvokeError(e.to_string()))?;
 
         //if error_code key in response, means RemoteAPIError
         if response.get("error_code").is_some() {
-            return Err(ChatError::RemoteAPIError(response.to_string()));
+            return Err(ErnieError::RemoteAPIError(response.to_string()));
         }
         Ok(Response::new(response))
     }
@@ -140,7 +137,7 @@ impl Chat {
         &self,
         messages: Vec<Message>,
         options: Vec<Opt>,
-    ) -> Result<StreamResponse, ChatError> {
+    ) -> Result<StreamResponse, ErnieError> {
         let body = Chat::generate_body(messages, options, true)?;
         let client = reqwest::Client::new();
         let mut event_source = client
@@ -149,7 +146,7 @@ impl Chat {
             .query(&[("access_token", self.access_token.as_str())])
             .json(&body)
             .eventsource()
-            .map_err(|e| ChatError::StreamError(e.to_string()))?;
+            .map_err(|e| ErnieError::StreamError(e.to_string()))?;
         let (sender, stream_response) = StreamResponse::new();
         tokio::spawn(async move {
             while let Some(event) = event_source.next().await {
@@ -209,7 +206,7 @@ mod tests {
         ];
         let options = vec![Opt::Temperature(0.5), Opt::TopP(0.5), Opt::TopK(50)];
         let response = chat.invoke(messages, options).unwrap();
-        let result = response.get_result().unwrap();
+        let result = response.get_chat_result().unwrap();
         println!("{}", result);
     }
 
@@ -244,7 +241,7 @@ mod tests {
         let options = Vec::new();
         let rt = Runtime::new().unwrap();
         let response = rt.block_on(chat.ainvoke(messages, options)).unwrap();
-        let result = response.get_result().unwrap();
+        let result = response.get_chat_result().unwrap();
         println!("{}", result);
     }
 
@@ -263,7 +260,7 @@ mod tests {
         rt.block_on(async move {
             let mut stream_response = chat.astream(messages, options).await.unwrap();
             while let Some(response) = stream_response.next().await {
-                let result = response.get_result().unwrap();
+                let result = response.get_chat_result().unwrap();
                 println!("{}", result);
             }
         })

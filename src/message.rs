@@ -18,8 +18,8 @@ pub struct Message {
 
 #[cfg(test)]
 mod tests {
-    use super::{Message,Role};
-    use serde_json::{to_string, self};
+    use super::{Message, Role};
+    use serde_json::{self, to_string};
     #[test]
     fn test_message() {
         let message1 = Message {

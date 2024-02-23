@@ -1,31 +1,46 @@
+use super::errors::ErnieError;
 use reqwest;
-use std::{collections::HashMap, env::var};
 use serde_json::Value;
-use super::errors::GetAccessTokenError;
-pub fn get_access_token() -> Result<String,GetAccessTokenError> {
+use std::{collections::HashMap, env::var};
+use url::{ParseError, Url};
+
+pub fn get_access_token() -> Result<String, ErnieError> {
     let url = "https://aip.baidubce.com/oauth/2.0/token";
-    let ak = var("QIANFAN_AK").map_err(
-        |_| GetAccessTokenError::Details("QIANFAN_AK is not set".to_string())
-    )?;
-    let sk = var("QIANFAN_SK").map_err(
-        |_| GetAccessTokenError::Details("QIANFAN_SK is not set".to_string())
-    )?;
+    let ak = var("QIANFAN_AK")
+        .map_err(|_| ErnieError::GetAccessTokenError("QIANFAN_AK is not set".to_string()))?;
+    let sk = var("QIANFAN_SK")
+        .map_err(|_| ErnieError::GetAccessTokenError("QIANFAN_SK is not set".to_string()))?;
 
     let client = reqwest::blocking::Client::new();
-    let res: Value = client.post(url)
-        .query(&[("grant_type", "client_credentials"), ("client_id", ak.as_str()), ("client_secret", sk.as_str())])
+    let res: Value = client
+        .post(url)
+        .query(&[
+            ("grant_type", "client_credentials"),
+            ("client_id", ak.as_str()),
+            ("client_secret", sk.as_str()),
+        ])
         .send()
-        .map_err(|e| GetAccessTokenError::Details(e.to_string()))?
+        .map_err(|e| ErnieError::GetAccessTokenError(e.to_string()))?
         .json()
-        .map_err(|e| GetAccessTokenError::Details(e.to_string()))?;
-    
+        .map_err(|e| ErnieError::GetAccessTokenError(e.to_string()))?;
+
     if let Some(error) = res.get("error") {
         let error_description = res.get("error_description").unwrap();
-        Err(GetAccessTokenError::Details(format!("{}: {}", error, error_description)))
+        Err(ErnieError::GetAccessTokenError(format!(
+            "{}: {}",
+            error, error_description
+        )))
     } else {
         let access_token = res.get("access_token").unwrap().as_str().unwrap();
         Ok(access_token.to_string())
     }
+}
+
+/// Build the url for the chat model
+pub fn build_url(url: &str, model: &str) -> Result<Url, ParseError> {
+    let base = Url::parse(url)?;
+    let joined = base.join(model)?;
+    Ok(joined)
 }
 
 #[cfg(test)]

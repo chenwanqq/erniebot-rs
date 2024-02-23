@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all(serialize="snake_case", deserialize="snake_case"))]
+#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
 pub enum ResponseFormat {
     JsonObject,
     Text,
@@ -16,7 +16,7 @@ impl ToString for ResponseFormat {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all(serialize="snake_case", deserialize="snake_case"))]
+#[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
 pub enum Opt {
     Temperature(f32),
     TopP(f32),

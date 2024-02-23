@@ -1,4 +1,4 @@
-use super::errors::GetResponseError;
+use super::errors::ErnieError;
 use serde::{Deserialize, Serialize};
 use serde_json::value;
 use tokio::sync::mpsc::{self, UnboundedReceiver};
@@ -27,15 +27,43 @@ impl Response {
         self.raw_response.get_mut(key)
     }
 
-    pub fn get_result(&self) -> Result<String, GetResponseError> {
+    pub fn get_chat_result(&self) -> Result<String, ErnieError> {
         match self.raw_response.get("result") {
             Some(result) => match result.as_str() {
                 Some(result_str) => Ok(result_str.to_string()),
-                None => Err(GetResponseError::Details(
+                None => Err(ErnieError::GetResponseError(
                     "result is not a string".to_string(),
                 )),
             },
-            None => Err(GetResponseError::Details("result is not found".to_string())),
+            None => Err(ErnieError::GetResponseError(
+                "result is not found".to_string(),
+            )),
+        }
+    }
+
+    pub fn get_embedding_results(&self) -> Result<Vec<Vec<f64>>, ErnieError> {
+        match self.raw_response.get("data") {
+            Some(data) => {
+                let mut result = Vec::new();
+                let data_array = data.as_array().ok_or(ErnieError::GetResponseError(
+                    "embedding data is not an array".to_string(),
+                ))?;
+                for embedding_data in data_array {
+                    let embedding =
+                        embedding_data
+                            .get("embedding")
+                            .ok_or(ErnieError::GetResponseError(
+                                "embedding is not found".to_string(),
+                            ))?;
+                    let embedding_array: Vec<f64> = serde_json::from_value(embedding.clone())
+                        .map_err(|e| ErnieError::GetResponseError(e.to_string()))?;
+                    result.push(embedding_array);
+                }
+                Ok(result)
+            }
+            None => Err(ErnieError::GetResponseError(
+                "embedding data is not found".to_string(),
+            )),
         }
     }
 }
@@ -47,7 +75,7 @@ pub struct Responses {
 }
 
 impl Responses {
-    pub fn from_text(text: String) -> Result<Self, GetResponseError> {
+    pub fn from_text(text: String) -> Result<Self, ErnieError> {
         let parts = text.split("\n\n").collect::<Vec<&str>>();
         let mut result = Vec::new();
         for part in parts {
@@ -58,12 +86,12 @@ impl Responses {
             match json_str {
                 Some(json_str) => {
                     let response: value::Value = serde_json::from_str(json_str)
-                        .map_err(|e| GetResponseError::Details(e.to_string()))?;
+                        .map_err(|e| ErnieError::GetResponseError(e.to_string()))?;
                     let response = Response::new(response);
                     result.push(response);
                 }
                 None => {
-                    return Err(GetResponseError::Details(format!(
+                    return Err(ErnieError::GetResponseError(format!(
                         "json_str is not found in this part of data: {}",
                         part
                     )))
@@ -72,18 +100,18 @@ impl Responses {
         }
         Ok(Responses { responses: result })
     }
-    pub fn get_results(&self) -> Result<Vec<String>, GetResponseError> {
+    pub fn get_results(&self) -> Result<Vec<String>, ErnieError> {
         let mut result = Vec::new();
         for response in &self.responses {
-            result.push(response.get_result()?);
+            result.push(response.get_chat_result()?);
         }
         Ok(result)
     }
 
-    pub fn get_whole_result(&self) -> Result<String, GetResponseError> {
+    pub fn get_whole_result(&self) -> Result<String, ErnieError> {
         let mut result = String::new();
         for response in &self.responses {
-            result.push_str(&response.get_result()?);
+            result.push_str(&response.get_chat_result()?);
         }
         Ok(result)
     }
