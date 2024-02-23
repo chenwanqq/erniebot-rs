@@ -17,7 +17,7 @@ impl ToString for ResponseFormat {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
-pub enum Opt {
+pub enum ChatOpt {
     Temperature(f32),
     TopP(f32),
     TopK(u32),

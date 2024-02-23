@@ -3,7 +3,7 @@ use crate::message;
 use super::errors::ErnieError;
 use super::message::{Message, Role};
 use super::model::ChatModel;
-use super::option::Opt;
+use super::option::ChatOpt;
 use super::response::{Response, Responses, StreamResponse};
 use super::utils::{build_url, get_access_token};
 use json_value_merge::Merge;
@@ -42,7 +42,7 @@ impl Chat {
 
     fn generate_body(
         messages: Vec<Message>,
-        options: Vec<Opt>,
+        options: Vec<ChatOpt>,
         stream: bool,
     ) -> Result<serde_json::Value, ErnieError> {
         let mut body = serde_json::json!({
@@ -67,7 +67,7 @@ impl Chat {
     pub fn invoke(
         &self,
         messages: Vec<Message>,
-        options: Vec<Opt>,
+        options: Vec<ChatOpt>,
     ) -> Result<Response, ErnieError> {
         let body = Chat::generate_body(messages, options, false)?;
         let client = reqwest::blocking::Client::new();
@@ -90,7 +90,7 @@ impl Chat {
     pub fn stream(
         &self,
         messages: Vec<Message>,
-        options: Vec<Opt>,
+        options: Vec<ChatOpt>,
     ) -> Result<Responses, ErnieError> {
         let body = Chat::generate_body(messages, options, true)?;
         let client = reqwest::blocking::Client::new();
@@ -110,7 +110,7 @@ impl Chat {
     pub async fn ainvoke(
         &self,
         messages: Vec<Message>,
-        options: Vec<Opt>,
+        options: Vec<ChatOpt>,
     ) -> Result<Response, ErnieError> {
         let body = Chat::generate_body(messages, options, false)?;
         let client = reqwest::Client::new();
@@ -136,7 +136,7 @@ impl Chat {
     pub async fn astream(
         &self,
         messages: Vec<Message>,
-        options: Vec<Opt>,
+        options: Vec<ChatOpt>,
     ) -> Result<StreamResponse, ErnieError> {
         let body = Chat::generate_body(messages, options, true)?;
         let client = reqwest::Client::new();
@@ -177,7 +177,7 @@ impl Chat {
 
 #[cfg(test)]
 mod tests {
-    use super::{Chat, Message, Opt, Role};
+    use super::{Chat, Message, ChatOpt, Role};
     use tokio::runtime::Runtime;
     use tokio_stream::StreamExt;
 
@@ -188,7 +188,7 @@ mod tests {
             content: "hello, I'm a user".to_string(),
             name: None,
         }];
-        let options = vec![Opt::Temperature(0.5), Opt::TopP(0.5), Opt::TopK(50)];
+        let options = vec![ChatOpt::Temperature(0.5), ChatOpt::TopP(0.5), ChatOpt::TopK(50)];
         let result = Chat::generate_body(messages, options, true).unwrap();
         let s = serde_json::to_string(&result).unwrap();
         println!("{}", s);
@@ -204,7 +204,7 @@ mod tests {
                 name: None,
             },
         ];
-        let options = vec![Opt::Temperature(0.5), Opt::TopP(0.5), Opt::TopK(50)];
+        let options = vec![ChatOpt::Temperature(0.5), ChatOpt::TopP(0.5), ChatOpt::TopK(50)];
         let response = chat.invoke(messages, options).unwrap();
         let result = response.get_chat_result().unwrap();
         println!("{}", result);
@@ -220,7 +220,7 @@ mod tests {
                 name: None,
             },
         ];
-        let options = vec![Opt::Temperature(0.5), Opt::TopP(0.5), Opt::TopK(50)];
+        let options = vec![ChatOpt::Temperature(0.5), ChatOpt::TopP(0.5), ChatOpt::TopK(50)];
         let response = chat.stream(messages, options).unwrap();
         let result_by_chunk = response.get_results().unwrap();
         println!("{:?}", result_by_chunk);
