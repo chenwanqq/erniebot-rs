@@ -2,6 +2,15 @@
 
 Unofficial Ernie Rust SDK, currently supporting three modules: chat, text embedding (embedding), and text-to-image generation (text2image).
 
+# Installation
+
+Add the following to your Cargo.toml file:
+
+```toml
+[dependencies]
+erniebot-rs = {git = "https://github.com/chenwanqq/erniebot-rs"}
+```
+
 ## Authentication
 Before using, import AK and SK into environment variables:
 

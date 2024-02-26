@@ -2,6 +2,15 @@
 
 非官方的ernie rust SDK, 目前支持对话(chat)，文本嵌入(embedding)以及文生图(text2image)三个模块。
 
+## 安装  
+  
+在`Cargo.toml`文件中添加以下内容：  
+  
+```toml  
+[dependencies]  
+erniebot-rs = {git = "https://github.com/chenwanqq/erniebot-rs"}
+
+
 ## 鉴权
 
 使用前，将AK，SK导入到环境变量中：
