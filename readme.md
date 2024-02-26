@@ -139,6 +139,8 @@ fn main() {
 }
 ```
 ## TODO
+
+* Docs
 * Chat models are numerous, so options may not be complete and require further supplementation.
 * More testing is needed.
 * The Fuyu-8B image understanding model is not yet supported.
