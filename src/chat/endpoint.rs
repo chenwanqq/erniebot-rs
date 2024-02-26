@@ -12,7 +12,6 @@ use tokio_stream::StreamExt;
 use url::Url;
 
 static CHAT_API_URL: &str = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
-static CUSTOM_API_URL: &str = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
 
 //TODO: finish this
 pub struct ChatEndpoint {
@@ -32,7 +31,7 @@ impl ChatEndpoint {
     /// create a new chat instance using custom model release on https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{custom_endpoint}
     pub fn new_with_custom_endpoint(endpoint: &str) -> Result<Self, ErnieError> {
         Ok(ChatEndpoint {
-            url: build_url(CUSTOM_API_URL, endpoint)?,
+            url: build_url(CHAT_API_URL, endpoint)?,
             access_token: get_access_token()?,
         })
     }

@@ -83,9 +83,25 @@ fn test_astream() {
     println!();
 }
 
+fn test_custom_endpoint() {
+    let chat = ChatEndpoint::new_with_custom_endpoint("llama_2_70b").unwrap();
+    let messages = vec![
+            Message {
+                role: Role::User,
+                content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using a custom endpoint".to_string(),
+                name: None,
+            },
+        ];
+    let options = Vec::new();
+    let response = chat.invoke(messages, options).unwrap();
+    let result = response.get_chat_result().unwrap();
+    println!("{}", result);
+}
+
 fn main() {
     test_invoke();
     test_stream();
     test_ainvoke();
     test_astream();
+    test_custom_endpoint();
 }
