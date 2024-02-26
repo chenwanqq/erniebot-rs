@@ -1,5 +1,10 @@
 [package]
 name = "erniebot-rs"
+license = "MIT"
+description = "A unofficial Rust library for the Ernie API"
+homepage = "https://github.com/chenwanqq/erniebot-rs"
+repository = "https://github.com/chenwanqq/erniebot-rs"
+
 version = "0.1.0"
 edition = "2021"
 
