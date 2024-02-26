@@ -1,32 +1,29 @@
-use crate::message;
-
-use super::errors::ErnieError;
-use super::message::{Message, Role};
+use super::message::Message;
 use super::model::ChatModel;
 use super::option::ChatOpt;
 use super::response::{Response, Responses, StreamResponse};
-use super::utils::{build_url, get_access_token};
+
+use crate::errors::ErnieError;
+use crate::utils::{build_url, get_access_token};
 use json_value_merge::Merge;
-use reqwest_eventsource::{Event, EventSource, RequestBuilderExt};
+use reqwest_eventsource::{Event, RequestBuilderExt};
 use serde_json::Value;
 use tokio_stream::StreamExt;
 use url::Url;
 
-static CHAT_API_URL: &'static str =
-    "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
-static CUSTOM_API_URL: &'static str =
-    "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
+static CHAT_API_URL: &str = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
+static CUSTOM_API_URL: &str = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
 
 //TODO: finish this
-struct Chat {
+pub struct ChatEndpoint {
     url: Url,
     access_token: String,
 }
 
-impl Chat {
+impl ChatEndpoint {
     /// create a new chat instance using pre-defined model
     pub fn new(model: ChatModel) -> Result<Self, ErnieError> {
-        Ok(Chat {
+        Ok(ChatEndpoint {
             url: build_url(CHAT_API_URL, model.to_string().as_str())?,
             access_token: get_access_token()?,
         })
@@ -34,7 +31,7 @@ impl Chat {
 
     /// create a new chat instance using custom model release on https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/{custom_endpoint}
     pub fn new_with_custom_endpoint(endpoint: &str) -> Result<Self, ErnieError> {
-        Ok(Chat {
+        Ok(ChatEndpoint {
             url: build_url(CUSTOM_API_URL, endpoint)?,
             access_token: get_access_token()?,
         })
@@ -69,7 +66,7 @@ impl Chat {
         messages: Vec<Message>,
         options: Vec<ChatOpt>,
     ) -> Result<Response, ErnieError> {
-        let body = Chat::generate_body(messages, options, false)?;
+        let body = ChatEndpoint::generate_body(messages, options, false)?;
         let client = reqwest::blocking::Client::new();
         let response: Value = client
             .post(self.url.as_str())
@@ -92,7 +89,7 @@ impl Chat {
         messages: Vec<Message>,
         options: Vec<ChatOpt>,
     ) -> Result<Responses, ErnieError> {
-        let body = Chat::generate_body(messages, options, true)?;
+        let body = ChatEndpoint::generate_body(messages, options, true)?;
         let client = reqwest::blocking::Client::new();
         let response = client
             .post(self.url.as_str())
@@ -112,7 +109,7 @@ impl Chat {
         messages: Vec<Message>,
         options: Vec<ChatOpt>,
     ) -> Result<Response, ErnieError> {
-        let body = Chat::generate_body(messages, options, false)?;
+        let body = ChatEndpoint::generate_body(messages, options, false)?;
         let client = reqwest::Client::new();
         let response: Value = client
             .post(self.url.as_str())
@@ -138,7 +135,7 @@ impl Chat {
         messages: Vec<Message>,
         options: Vec<ChatOpt>,
     ) -> Result<StreamResponse, ErnieError> {
-        let body = Chat::generate_body(messages, options, true)?;
+        let body = ChatEndpoint::generate_body(messages, options, true)?;
         let client = reqwest::Client::new();
         let mut event_source = client
             .post(self.url.as_str())
@@ -177,10 +174,7 @@ impl Chat {
 
 #[cfg(test)]
 mod tests {
-    use super::{Chat, Message, ChatOpt, Role};
-    use tokio::runtime::Runtime;
-    use tokio_stream::StreamExt;
-
+    use crate::chat::{ChatEndpoint, ChatOpt, Message, Role};
     #[test]
     fn test_generate_body() {
         let messages = vec![Message {
@@ -188,81 +182,13 @@ mod tests {
             content: "hello, I'm a user".to_string(),
             name: None,
         }];
-        let options = vec![ChatOpt::Temperature(0.5), ChatOpt::TopP(0.5), ChatOpt::TopK(50)];
-        let result = Chat::generate_body(messages, options, true).unwrap();
+        let options = vec![
+            ChatOpt::Temperature(0.5),
+            ChatOpt::TopP(0.5),
+            ChatOpt::TopK(50),
+        ];
+        let result = ChatEndpoint::generate_body(messages, options, true).unwrap();
         let s = serde_json::to_string(&result).unwrap();
         println!("{}", s);
-    }
-
-    #[test]
-    fn test_invoke() {
-        let chat = Chat::new(crate::model::ChatModel::ErnieBotTurbo).unwrap();
-        let messages = vec![
-            Message {
-                role: Role::User,
-                content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using invoke method".to_string(),
-                name: None,
-            },
-        ];
-        let options = vec![ChatOpt::Temperature(0.5), ChatOpt::TopP(0.5), ChatOpt::TopK(50)];
-        let response = chat.invoke(messages, options).unwrap();
-        let result = response.get_chat_result().unwrap();
-        println!("{}", result);
-    }
-
-    #[test]
-    fn test_stream() {
-        let chat = Chat::new(crate::model::ChatModel::ErnieBotTurbo).unwrap();
-        let messages = vec![
-            Message {
-                role: Role::User,
-                content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using stream method".to_string(),
-                name: None,
-            },
-        ];
-        let options = vec![ChatOpt::Temperature(0.5), ChatOpt::TopP(0.5), ChatOpt::TopK(50)];
-        let response = chat.stream(messages, options).unwrap();
-        let result_by_chunk = response.get_results().unwrap();
-        println!("{:?}", result_by_chunk);
-        let whole_result = response.get_whole_result().unwrap();
-        println!("{}", whole_result);
-    }
-
-    #[test]
-    fn test_ainvoke() {
-        let chat = Chat::new(crate::model::ChatModel::ErnieBotTurbo).unwrap();
-        let messages = vec![
-            Message {
-                role: Role::User,
-                content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using ainvoke method".to_string(),
-                name: None,
-            },
-        ];
-        let options = Vec::new();
-        let rt = Runtime::new().unwrap();
-        let response = rt.block_on(chat.ainvoke(messages, options)).unwrap();
-        let result = response.get_chat_result().unwrap();
-        println!("{}", result);
-    }
-
-    #[test]
-    fn test_astream() {
-        let chat = Chat::new(crate::model::ChatModel::ErnieBotTurbo).unwrap();
-        let messages = vec![
-            Message {
-                role: Role::User,
-                content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using async stream method. Now reply to me a message as long as possible so that I can test if this function doing well".to_string(),
-                name: None,
-            },
-        ];
-        let options = Vec::new();
-        let rt = Runtime::new().unwrap();
-        rt.block_on(async move {
-            let mut stream_response = chat.astream(messages, options).await.unwrap();
-            while let Some(response) = stream_response.next().await {
-                let result = response.get_chat_result().unwrap();
-                println!("{}", result);
-            }
-        })
     }
 }

@@ -1,4 +1,4 @@
-use super::errors::ErnieError;
+use crate::errors::ErnieError;
 use serde::{Deserialize, Serialize};
 use serde_json::value;
 use tokio::sync::mpsc::{self, UnboundedReceiver};
@@ -41,30 +41,22 @@ impl Response {
         }
     }
 
-    pub fn get_embedding_results(&self) -> Result<Vec<Vec<f64>>, ErnieError> {
-        match self.raw_response.get("data") {
-            Some(data) => {
-                let mut result = Vec::new();
-                let data_array = data.as_array().ok_or(ErnieError::GetResponseError(
-                    "embedding data is not an array".to_string(),
-                ))?;
-                for embedding_data in data_array {
-                    let embedding =
-                        embedding_data
-                            .get("embedding")
-                            .ok_or(ErnieError::GetResponseError(
-                                "embedding is not found".to_string(),
-                            ))?;
-                    let embedding_array: Vec<f64> = serde_json::from_value(embedding.clone())
-                        .map_err(|e| ErnieError::GetResponseError(e.to_string()))?;
-                    result.push(embedding_array);
-                }
-                Ok(result)
-            }
-            None => Err(ErnieError::GetResponseError(
-                "embedding data is not found".to_string(),
-            )),
-        }
+    pub fn get_prompt_tokens(&self) -> Option<u64> {
+        let usage = self.get("usage")?.as_object()?;
+        let prompt_tokens = usage.get("prompt_tokens")?.as_u64()?;
+        Some(prompt_tokens)
+    }
+
+    pub fn get_completion_tokens(&self) -> Option<u64> {
+        let usage = self.get("usage")?.as_object()?;
+        let completion_tokens = usage.get("completion_tokens")?.as_u64()?;
+        Some(completion_tokens)
+    }
+
+    pub fn get_total_tokens(&self) -> Option<u64> {
+        let usage = self.get("usage")?.as_object()?;
+        let total_tokens = usage.get("total_tokens")?.as_u64()?;
+        Some(total_tokens)
     }
 }
 

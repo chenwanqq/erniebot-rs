@@ -1,7 +1,8 @@
 use super::errors::ErnieError;
-use reqwest;
+use base64::prelude::*;
+use image::{DynamicImage, ImageResult};
 use serde_json::Value;
-use std::{collections::HashMap, env::var};
+use std::env::var;
 use url::{ParseError, Url};
 
 pub fn get_access_token() -> Result<String, ErnieError> {
@@ -41,6 +42,12 @@ pub fn build_url(url: &str, model: &str) -> Result<Url, ParseError> {
     let base = Url::parse(url)?;
     let joined = base.join(model)?;
     Ok(joined)
+}
+
+pub fn base64_to_image(image_string: String) -> ImageResult<DynamicImage> {
+    let bytes = BASE64_STANDARD.decode(image_string).unwrap();
+    let img = image::load_from_memory(&bytes).unwrap();
+    Ok(img)
 }
 
 #[cfg(test)]
