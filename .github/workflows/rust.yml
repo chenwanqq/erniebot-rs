@@ -18,6 +18,6 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: Run fmt
-      run: cargo fmt --check
+      run: cargo fmt -- --check
     - name: Run clippy
       run: cargo clippy --all-targets --all-features -- -D warnings
