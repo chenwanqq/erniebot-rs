@@ -13,7 +13,8 @@ use url::Url;
 
 static CHAT_API_URL: &str = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/";
 
-//TODO: finish this
+/** ChatEndpoint is a struct that represents the chat endpoint of erniebot API
+*/
 pub struct ChatEndpoint {
     url: Url,
     access_token: String,
@@ -60,6 +61,7 @@ impl ChatEndpoint {
         Ok(body)
     }
 
+    /// invoke method is used to send a request to erniebot chat endpoint. This is a blocking method that will return a full response from the chat endpoint
     pub fn invoke(
         &self,
         messages: Vec<Message>,
@@ -83,6 +85,7 @@ impl ChatEndpoint {
         }
         Ok(Response::new(response))
     }
+    /// stream method is used to send a request to erniebot chat endpoint. This is a blocking method that will return response in multiple chunks from the chat endpoint
     pub fn stream(
         &self,
         messages: Vec<Message>,
@@ -103,6 +106,7 @@ impl ChatEndpoint {
         Ok(response)
     }
 
+    /// ainvoke method is used to send a request to erniebot chat endpoint. This is an async method that will return a full response from the chat endpoint
     pub async fn ainvoke(
         &self,
         messages: Vec<Message>,
@@ -129,6 +133,7 @@ impl ChatEndpoint {
         Ok(Response::new(response))
     }
 
+    /// astream method is used to send a request to erniebot chat endpoint. This is an async method that will return response in multiple chunks from the chat endpoint
     pub async fn astream(
         &self,
         messages: Vec<Message>,
