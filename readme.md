@@ -1,6 +1,6 @@
 # erniebot-rs
 
-Unofficial Ernie Rust SDK, currently supporting three modules: chat, text embedding (embedding), and text-to-image generation (text2image).
+Unofficial Baidu Ernie(Wenxin Yiyan, Qianfan) Rust SDK, currently supporting three modules: chat, text embedding (embedding), and text-to-image generation (text2image).
 
 ## Installation
 

@@ -1,6 +1,6 @@
 # erniebot-rs
 
-非官方的ernie rust SDK, 目前支持对话(chat)，文本嵌入(embedding)以及文生图(text2image)三个模块。
+非官方的百度千帆大模型（文心一言，或者是Ernie，随便啦）SDK, 目前支持对话(chat)，文本嵌入(embedding)以及文生图(text2image)三个模块。
 
 ## 安装  
   
@@ -9,7 +9,7 @@
 ```toml  
 [dependencies]  
 erniebot-rs = {git = "https://github.com/chenwanqq/erniebot-rs"}
-
+```
 
 ## 鉴权
 
