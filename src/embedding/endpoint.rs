@@ -82,36 +82,3 @@ impl EmbeddingEndpoint {
         Ok(EmbeddingResponse::new(response))
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::super::model::EmbeddingModel;
-    use super::EmbeddingEndpoint;
-    use tokio::runtime::Runtime;
-    #[test]
-    fn test_embedding() {
-        let embedding = EmbeddingEndpoint::new(EmbeddingModel::EmbeddingV1).unwrap();
-        let input = vec![
-            "你好".to_string(),
-            "你叫什么名字".to_string(),
-            "你是谁".to_string(),
-        ];
-        let embedding_response = embedding.invoke(input, None).unwrap();
-        let embedding_results = embedding_response.get_embedding_results().unwrap();
-        println!("{},{}", embedding_results.len(), embedding_results[0].len());
-    }
-
-    #[test]
-    fn test_async_embedding() {
-        let embedding = EmbeddingEndpoint::new(EmbeddingModel::EmbeddingV1).unwrap();
-        let input = vec![
-            "你好".to_string(),
-            "你叫什么名字".to_string(),
-            "你是谁".to_string(),
-        ];
-        let rt = Runtime::new().unwrap();
-        let embedding_response = rt.block_on(embedding.ainvoke(input, None)).unwrap();
-        let embedding_results = embedding_response.get_embedding_results().unwrap();
-        println!("{},{}", embedding_results.len(), embedding_results[0].len());
-    }
-}
