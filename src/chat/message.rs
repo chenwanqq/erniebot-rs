@@ -7,7 +7,9 @@ pub enum Role {
     Assistant,
     Function,
 }
-/**  as metioned in <https://cloud.baidu.com/doc/WENXINWORKSHOP/s/jlil56u11>,
+/**  Definition of the message structure
+
+as metioned in <https://cloud.baidu.com/doc/WENXINWORKSHOP/s/jlil56u11>,
 The "messages" member must not be empty. One member represents a single round of conversation, while multiple members represent multiple rounds of conversation. For example:
 (1) Example with one member: "messages": [ {"role": "user", "content": "Hello"}]
 ```
