@@ -35,7 +35,7 @@ fn test_invoke() {
         Message {  
             role: Role::User,  
             content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using invoke method".to_string(),  
-            name: None,  
+            ..Default::default()  
         },  
     ];  
     let options = vec![  
@@ -58,7 +58,7 @@ fn test_custom_endpoint() {
         Message {  
             role: Role::User,  
             content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using a custom endpoint".to_string(),  
-            name: None,  
+            ..Default::default()  
         },  
     ];  
     let options = Vec::new();  
@@ -79,7 +79,7 @@ fn test_astream() {
         Message {  
             role: Role::User,  
             content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using async stream method. Now reply to me a message as long as possible so that I can test if this function doing well".to_string(),  
-            name: None,  
+            ..Default::default()  
         },  
     ];  
     let options = Vec::new();  
@@ -96,6 +96,8 @@ fn test_astream() {
     println!();  
 }
 ```
+
+For some models, such as ErnieBot, they support the option of passing in functions for invocation. You can refer to examples/chat_with_function.rs for an example.
 
 Please note that due to varying parameter requirements for each specific model, this SDK does not perform local parameter validation but instead passes the parameters to the server for validation. Therefore, if the parameters do not meet the requirements, the server will return an error message.
 

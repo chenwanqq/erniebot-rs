@@ -10,7 +10,7 @@ fn test_invoke() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using invoke method".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = vec![
@@ -29,7 +29,7 @@ fn test_stream() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using stream method".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = vec![
@@ -50,7 +50,7 @@ fn test_ainvoke() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using ainvoke method".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = Vec::new();
@@ -66,7 +66,7 @@ fn test_astream() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using async stream method. Now reply to me a message as long as possible so that I can test if this function doing well".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = Vec::new();
@@ -89,7 +89,7 @@ fn test_custom_endpoint() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using a custom endpoint".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = Vec::new();

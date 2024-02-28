@@ -24,3 +24,4 @@ tokio = { version = "1.36.0", features = ["full"] }
 tokio-stream = "0.1.14"
 base64 = "0.21.7"
 image = "0.24.9"
+schemars = "0.8"
