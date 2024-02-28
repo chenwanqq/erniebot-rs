@@ -35,7 +35,7 @@ fn test_invoke() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using invoke method".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = vec![
@@ -58,7 +58,7 @@ fn test_invoke() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using a custom endpoint".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = Vec::new();
@@ -79,7 +79,7 @@ fn test_astream() {
             Message {
                 role: Role::User,
                 content: "hello, I'm a developer. I'm developing a rust SDK for qianfan LLM. If you get this message, that means I successfully send you this message using async stream method. Now reply to me a message as long as possible so that I can test if this function doing well".to_string(),
-                name: None,
+                ..Default::default()
             },
         ];
     let options = Vec::new();
@@ -96,6 +96,8 @@ fn test_astream() {
     println!();
 }
 ```
+
+对于一些模型，如ErnieBot，支持传入functions进行调用的选择，可以参考examples/chat_with_function.rs
 
 注意，由于各个具体模型对参数的要求不同，所以本SDK并未在本地进行参数校验，而是将参数传递给服务端进行校验。因此，如果参数不符合要求，服务端会返回错误信息。
 

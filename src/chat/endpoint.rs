@@ -184,7 +184,7 @@ mod tests {
         let messages = vec![Message {
             role: Role::User,
             content: "hello, I'm a user".to_string(),
-            name: None,
+            ..Default::default()
         }];
         let options = vec![
             ChatOpt::Temperature(0.5),

@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::{Function, ToolChoice};
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
 pub enum ResponseFormat {
@@ -21,4 +23,6 @@ pub enum ChatOpt {
     MaxOutputTokens(u32),
     ResponseFormat(ResponseFormat),
     UserId(String),
+    Functions(Vec<Function>),
+    ToolChoice(ToolChoice),
 }
