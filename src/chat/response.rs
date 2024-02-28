@@ -1,3 +1,4 @@
+use super::FunctionCall;
 use crate::errors::ErnieError;
 use serde::{Deserialize, Serialize};
 use serde_json::value;
@@ -57,6 +58,12 @@ impl Response {
         let usage = self.get("usage")?.as_object()?;
         let total_tokens = usage.get("total_tokens")?.as_u64()?;
         Some(total_tokens)
+    }
+
+    pub fn get_function_call(&self) -> Option<FunctionCall> {
+        let value = self.get("function_call")?;
+        let function_call = serde_json::from_value(value.clone()).ok()?;
+        Some(function_call)
     }
 }
 

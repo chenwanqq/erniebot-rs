@@ -1,8 +1,10 @@
+use super::FunctionCall;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 #[serde(rename_all(serialize = "snake_case", deserialize = "snake_case"))]
 pub enum Role {
+    #[default]
     User,
     Assistant,
     Function,
@@ -15,7 +17,7 @@ The "messages" member must not be empty. One member represents a single round of
     let message1 = Message {
         role: Role::User,
         content: "hello, I'm a user".to_string(),
-        name: None,
+        ..Default::default()
     };
     let messages = vec![message1];
 ```
@@ -24,17 +26,17 @@ The "messages" member must not be empty. One member represents a single round of
     let message1 = Message {
         role: Role::User,
         content: "hello, I'm a user".to_string(),
-        name: None,
+        ..Default::default()
     };
     let message2 = Message {
         role: Role::Assistant,
         content: "hello, I'm a AI LLM model".to_string(),
-        name: None,
+        ..Default::default()
     };
     let message3 = Message {
         role: Role::User,
         content: "hello, I want you to help me".to_string(),
-        name: None,
+        ..Default::default()
     };
     let messages = vec![message1, message2, message3];
 ```
@@ -44,12 +46,14 @@ The number of members must be odd. The role values of the messages in the member
 
 In the example, the role values of the messages are "user", "assistant", "user", "assistant", and "user" respectively. The role values of the messages at odd positions are "user", which means the role values of the 1st, 3rd, and 5th messages are "user". The role values at even positions are "assistant", which means the role values of the 2nd and 4th messages are "assistant".
 */
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub struct Message {
     pub role: Role,
     pub content: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub function_call: Option<FunctionCall>,
 }
 
 #[cfg(test)]
@@ -61,17 +65,17 @@ mod tests {
         let message1 = Message {
             role: Role::User,
             content: "hello, I'm a user".to_string(),
-            name: None,
+            ..Default::default()
         };
         let message2 = Message {
             role: Role::Assistant,
             content: "hello, I'm a AI LLM model".to_string(),
-            name: None,
+            ..Default::default()
         };
         let message3 = Message {
             role: Role::User,
             content: "hello, I want you to help me".to_string(),
-            name: None,
+            ..Default::default()
         };
         let messages = vec![message1, message2, message3];
         let messages_str = to_string(&messages).unwrap();
