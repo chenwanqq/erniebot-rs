@@ -25,6 +25,7 @@ impl EmbeddingResponse {
         self.raw_response.get_mut(key)
     }
 
+    /// get the result of embedding response
     pub fn get_embedding_results(&self) -> Result<Vec<Vec<f64>>, ErnieError> {
         match self.raw_response.get("data") {
             Some(data) => {
@@ -54,13 +55,13 @@ impl EmbeddingResponse {
             )),
         }
     }
-
+    /// get tokens used by prompt
     pub fn get_prompt_tokens(&self) -> Option<u64> {
         let usage = self.get("usage")?.as_object()?;
         let prompt_tokens = usage.get("prompt_tokens")?.as_u64()?;
         Some(prompt_tokens)
     }
-
+    /// get tokens used by completion
     pub fn get_total_tokens(&self) -> Option<u64> {
         let usage = self.get("usage")?.as_object()?;
         let total_tokens = usage.get("total_tokens")?.as_u64()?;

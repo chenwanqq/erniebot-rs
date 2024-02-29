@@ -10,3 +10,4 @@ pub use function::{Example, Function, FunctionCall, ToolChoice};
 pub use message::{Message, Role};
 pub use model::ChatModel;
 pub use option::{ChatOpt, ResponseFormat};
+pub use response::{Response, Responses, StreamResponse};

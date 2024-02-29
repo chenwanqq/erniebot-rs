@@ -5,7 +5,9 @@ use serde_json::value;
 use tokio::sync::mpsc::{self, UnboundedReceiver};
 use tokio_stream::Stream;
 
-/// Response is using for non-stream response
+/// Response is a struct that represents the response of erniebot API.
+///
+/// It is a wrapper of serde_json::Value. in non-stream case, the API will return a single response, and in stream case, the API will return multiple responses.(see in `Responses` struct)
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Response {
     raw_response: value::Value,
@@ -28,6 +30,7 @@ impl Response {
         self.raw_response.get_mut(key)
     }
 
+    /// get the result of chat response
     pub fn get_chat_result(&self) -> Result<String, ErnieError> {
         match self.raw_response.get("result") {
             Some(result) => match result.as_str() {
@@ -42,24 +45,28 @@ impl Response {
         }
     }
 
+    /// get tokens used by prompt
     pub fn get_prompt_tokens(&self) -> Option<u64> {
         let usage = self.get("usage")?.as_object()?;
         let prompt_tokens = usage.get("prompt_tokens")?.as_u64()?;
         Some(prompt_tokens)
     }
 
+    /// get tokens used by completion
     pub fn get_completion_tokens(&self) -> Option<u64> {
         let usage = self.get("usage")?.as_object()?;
         let completion_tokens = usage.get("completion_tokens")?.as_u64()?;
         Some(completion_tokens)
     }
 
+    /// get total tokens used
     pub fn get_total_tokens(&self) -> Option<u64> {
         let usage = self.get("usage")?.as_object()?;
         let total_tokens = usage.get("total_tokens")?.as_u64()?;
         Some(total_tokens)
     }
 
+    /// get function call
     pub fn get_function_call(&self) -> Option<FunctionCall> {
         let value = self.get("function_call")?;
         let function_call = serde_json::from_value(value.clone()).ok()?;
@@ -67,13 +74,14 @@ impl Response {
     }
 }
 
-/// Responses is using for sync stream response
+/// Responses is using for sync stream response.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Responses {
     responses: Vec<Response>,
 }
 
 impl Responses {
+    /// get Responses from reqwest::blocking::client. In the response body, it contains multiple responses split by blank line. This method will parse the response body and return a Responses struct.
     pub fn from_text(text: String) -> Result<Self, ErnieError> {
         let parts = text.split("\n\n").collect::<Vec<&str>>();
         let mut result = Vec::new();
@@ -99,6 +107,8 @@ impl Responses {
         }
         Ok(Responses { responses: result })
     }
+
+    /// get chat result as a vector of string
     pub fn get_results(&self) -> Result<Vec<String>, ErnieError> {
         let mut result = Vec::new();
         for response in &self.responses {
@@ -107,6 +117,7 @@ impl Responses {
         Ok(result)
     }
 
+    /// get whole chat result as a single string
     pub fn get_whole_result(&self) -> Result<String, ErnieError> {
         let mut result = String::new();
         for response in &self.responses {
@@ -116,6 +127,7 @@ impl Responses {
     }
 }
 
+/// StreamResponse is a struct that represents the response of erniebot API in async stream case.
 pub struct StreamResponse {
     receiver: UnboundedReceiver<Response>,
 }

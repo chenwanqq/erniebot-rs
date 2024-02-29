@@ -9,12 +9,15 @@ use url::Url;
 static EMBEDDING_BASE_URL: &str =
     "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/embeddings/";
 
+/** ChatEndpoint is a struct that represents the chat endpoint of erniebot API
+*/
 pub struct EmbeddingEndpoint {
     url: Url,
     access_token: String,
 }
 
 impl EmbeddingEndpoint {
+    // create a new embedding instance using pre-defined model
     pub fn new(model: EmbeddingModel) -> Result<Self, ErnieError> {
         Ok(EmbeddingEndpoint {
             url: build_url(EMBEDDING_BASE_URL, model.to_string().as_str())?,

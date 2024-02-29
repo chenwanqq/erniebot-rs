@@ -10,13 +10,14 @@ use crate::utils::{build_url, get_access_token};
 
 static TEXT2IMAGE_BASE_URL: &str =
     "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/text2image/";
-
+/// Text2ImageEndpoint is a struct that represents the text2image endpoint of erniebot API
 pub struct Text2ImageEndpoint {
     url: Url,
     access_token: String,
 }
 
 impl Text2ImageEndpoint {
+    /// create a new text2image instance using pre-defined model
     pub fn new(model: Text2ImageModel) -> Result<Self, ErnieError> {
         Ok(Text2ImageEndpoint {
             url: build_url(TEXT2IMAGE_BASE_URL, model.to_string().as_str())?,
@@ -24,6 +25,7 @@ impl Text2ImageEndpoint {
         })
     }
 
+    /// create a new text2image instance using custom endpoint
     pub fn new_with_custom_endpoint(endpoint: &str) -> Result<Self, ErnieError> {
         Ok(Text2ImageEndpoint {
             url: build_url(TEXT2IMAGE_BASE_URL, endpoint)?,
@@ -41,6 +43,7 @@ impl Text2ImageEndpoint {
         body
     }
 
+    /// sync invoke
     pub fn invoke(
         &self,
         prompt: String,
