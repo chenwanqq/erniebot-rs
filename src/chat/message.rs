@@ -50,10 +50,14 @@ In the example, the role values of the messages are "user", "assistant", "user",
 */
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub struct Message {
+    /// The role of the message. The value can be "user", "assistant", or "function"(for some specific model).
     pub role: Role,
+    /// The content of the message. The value is a string.
     pub content: String,
+    /// The name of the function. The value is a string. This member is required when the role value is "function", and in this case is should be the name in the function_call in the response content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    /// this is function calling result of last round of function call, serving as chat history.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub function_call: Option<FunctionCall>,
 }
