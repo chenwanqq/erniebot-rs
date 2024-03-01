@@ -8,7 +8,7 @@ Add the following to your Cargo.toml file:
 
 ```toml
 [dependencies]
-erniebot-rs = {git = "https://github.com/chenwanqq/erniebot-rs"}
+erniebot-rs = "0.1.0"
 ```
 
 ## Authentication
