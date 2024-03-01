@@ -8,7 +8,7 @@
   
 ```toml  
 [dependencies]  
-erniebot-rs = {git = "https://github.com/chenwanqq/erniebot-rs"}
+erniebot-rs = "0.1.1"
 ```
 
 ## 鉴权
