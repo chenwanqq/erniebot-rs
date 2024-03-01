@@ -28,12 +28,11 @@ pub struct Function {
 pub struct Example {
     /// Same as the role in Message, can be "user", "assistant", or "function".
     pub role: Role,
-    /**Dialog content instructions:
+    /// Dialog content instructions:
 
-    (1) When the current message contains a function_call and the role is "assistant", the message can be empty. However, in other scenarios, it cannot be empty.
+    /// (1) If the current message contains a function_call and the role is "assistant", the message can be empty. However, in other scenarios, it cannot be empty.
 
-    (2) The content corresponding to the last message cannot be a blank character, including spaces, "\n", "\r", "\f", etc.
-    */
+    /// (2) The content corresponding to the last message cannot be a blank character, including spaces, "\n", "\r", r"\f", etc.
     pub content: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     /// The "author" of the message. the This member is required when the role value is "function", and in this case is should be the name in the function_call in the response content
