@@ -2,7 +2,7 @@ use crate::errors::ErnieError;
 use serde::{Deserialize, Serialize};
 use serde_json::value;
 
-/// Response is using for non-stream response
+/// Response of text2image endpoint
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Text2ImageResponse {
     raw_response: value::Value,
@@ -25,7 +25,7 @@ impl Text2ImageResponse {
         self.raw_response.get_mut(key)
     }
 
-    //return list of image b64 strings
+    /// return list of image b64 strings
     pub fn get_image_results(&self) -> Result<Vec<String>, ErnieError> {
         match self.raw_response.get("data") {
             Some(data) => {
@@ -56,12 +56,14 @@ impl Text2ImageResponse {
         }
     }
 
+    /// get tokens used by prompt
     pub fn get_prompt_tokens(&self) -> Option<u64> {
         let usage = self.get("usage")?.as_object()?;
         let prompt_tokens = usage.get("prompt_tokens")?.as_u64()?;
         Some(prompt_tokens)
     }
 
+    /// get total tokens used
     pub fn get_total_tokens(&self) -> Option<u64> {
         let usage = self.get("usage")?.as_object()?;
         let total_tokens = usage.get("total_tokens")?.as_u64()?;

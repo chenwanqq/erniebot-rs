@@ -19,12 +19,12 @@ fn main() {
     }];
     let examples = vec![vec![
         Example {
-            role: "user".to_string(),
+            role: Role::User,
             content: Some("What's the weather in Shanghai?".to_string()),
             ..Default::default()
         },
         Example {
-            role: "assistant".to_string(),
+            role: Role::Assistant,
             content: None,
             name: None,
             function_call: Some(erniebot_rs::chat::FunctionCall {
