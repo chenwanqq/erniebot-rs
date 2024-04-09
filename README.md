@@ -10,7 +10,7 @@ Add the following to your Cargo.toml file:
 
 ```toml
 [dependencies]
-erniebot-rs = "0.1.1"
+erniebot-rs = "0.2.1"
 ```
 
 ## Authentication

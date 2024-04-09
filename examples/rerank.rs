@@ -11,7 +11,8 @@ fn test_reranker() {
     ];
     let reranker_response = reranker.invoke(query, documents, None, None).unwrap();
     let reranker_results = reranker_response.get_reranker_response().unwrap();
-    println!("{},{:?}", reranker_results.len(), reranker_results);
+    let reranked_documents = reranker_results.into_iter().map(|x|x.document).collect::<Vec<String>>();
+    println!("{},{:?}", reranked_documents.len(), reranked_documents);
 }
 
 fn test_async_reranker() {

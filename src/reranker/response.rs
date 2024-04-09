@@ -65,7 +65,7 @@ impl RerankerResponse {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct RerankData {
-    document: String,
-    relevance_score: f64,
-    index: u64,
+    pub document: String,
+    pub relevance_score: f64,
+    pub index: u64,
 }
