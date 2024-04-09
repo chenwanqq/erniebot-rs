@@ -3,6 +3,7 @@ pub mod chat;
 /// Toolset to interact with embedding model in Qianfan platform
 pub mod embedding;
 pub mod errors;
+pub mod reranker;
 /// Toolset to interact with text2image model in Qianfan platform
 pub mod text2image;
 pub mod utils;

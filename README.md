@@ -2,6 +2,8 @@
 
 Unofficial Baidu Ernie(Wenxin Yiyan, Qianfan) Rust SDK, currently supporting three modules: chat, text embedding (embedding), and text-to-image generation (text2image).
 
+**update in 2024/04/09**: Add support for the bce-reranker-base-v1 rerank model
+
 ## Installation
 
 Add the following to your Cargo.toml file:

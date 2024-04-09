@@ -26,5 +26,7 @@ fn test_async_embedding() {
 
 fn main() {
     test_embedding();
+    //sleep to avoid qps
+    std::thread::sleep(std::time::Duration::from_secs(1));
     test_async_embedding();
 }
