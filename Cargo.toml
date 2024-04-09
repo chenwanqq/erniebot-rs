@@ -4,7 +4,7 @@ license = "MIT"
 description = "A unofficial Rust library for the Ernie API"
 homepage = "https://github.com/chenwanqq/erniebot-rs"
 repository = "https://github.com/chenwanqq/erniebot-rs"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 exclude = [".github/",".vscode/",".gitignore"]
 
@@ -17,12 +17,12 @@ strum_macros = "0.26.1"
 serde = {version = "1.0.197", features = ["derive"]}
 serde_json = "1.0.113"
 url = "2.5.0"
-reqwest = {version = "0.11.6", features = ["json","blocking"]}
+reqwest = {version = "0.12.3", features = ["json","blocking"]}
 thiserror = "1.0.57"
 json_value_merge = "2.0"
-reqwest-eventsource = "0.5.0"
+reqwest-eventsource = "0.6.0"
 tokio = { version = "1.36.0", features = ["full"] }
 tokio-stream = "0.1.14"
-base64 = "0.21.7"
-image = "0.24.9"
+base64 = "0.22.0"
+image = "0.25.1"
 schemars = "0.8"

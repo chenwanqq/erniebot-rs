@@ -2,6 +2,8 @@
 
 非官方的百度千帆大模型（文心一言，或者是Ernie，随便啦）SDK, 目前支持对话(chat)，文本嵌入(embedding)以及文生图(text2image)三个模块。
 
+**2024/04/09更新**: 添加对bce-reranker-base-v1重排序模型的支持
+
 ## 安装  
   
 在`Cargo.toml`文件中添加以下内容：  
