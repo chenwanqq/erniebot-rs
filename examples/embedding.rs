@@ -7,7 +7,7 @@ fn test_embedding() {
         "你叫什么名字".to_string(),
         "你是谁".to_string(),
     ];
-    let embedding_response = embedding.invoke(input, None).unwrap();
+    let embedding_response = embedding.invoke(&input, None).unwrap();
     let embedding_results = embedding_response.get_embedding_results().unwrap();
     println!("{},{}", embedding_results.len(), embedding_results[0].len());
 }
@@ -19,7 +19,7 @@ fn test_async_embedding() {
         "你是谁".to_string(),
     ];
     let rt = Runtime::new().unwrap();
-    let embedding_response = rt.block_on(embedding.ainvoke(input, None)).unwrap();
+    let embedding_response = rt.block_on(embedding.ainvoke(&input, None)).unwrap();
     let embedding_results = embedding_response.get_embedding_results().unwrap();
     println!("{},{}", embedding_results.len(), embedding_results[0].len());
 }

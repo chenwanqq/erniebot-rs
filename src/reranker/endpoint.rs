@@ -27,10 +27,10 @@ impl RerankerEndpoint {
     /// sync invoke
     pub fn invoke(
         &self,
-        query: String,
-        documents: Vec<String>,
+        query: &str,
+        documents: &Vec<String>,
         top_n: Option<u64>,
-        user_id: Option<String>,
+        user_id: Option<&str>,
     ) -> Result<RerankerResponse, ErnieError> {
         let mut body = serde_json::json!({
             "query": query,
@@ -62,10 +62,10 @@ impl RerankerEndpoint {
     ///async invoke
     pub async fn ainvoke(
         &self,
-        query: String,
-        documents: Vec<String>,
+        query: &str,
+        documents: &Vec<String>,
         top_n: Option<u64>,
-        user_id: Option<String>,
+        user_id: Option<&str>,
     ) -> Result<RerankerResponse, ErnieError> {
         let mut body = serde_json::json!({
             "query": query,

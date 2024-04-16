@@ -33,7 +33,7 @@ impl Text2ImageEndpoint {
         })
     }
 
-    fn generate_body(prompt: String, options: Vec<Text2ImageOpt>) -> serde_json::Value {
+    fn generate_body(prompt: &str, options: &Vec<Text2ImageOpt>) -> serde_json::Value {
         let mut body = serde_json::json!({
             "prompt": prompt,
         });
@@ -46,8 +46,8 @@ impl Text2ImageEndpoint {
     /// sync invoke
     pub fn invoke(
         &self,
-        prompt: String,
-        options: Vec<Text2ImageOpt>,
+        prompt: &str,
+        options: &Vec<Text2ImageOpt>,
     ) -> Result<Text2ImageResponse, ErnieError> {
         let body = Text2ImageEndpoint::generate_body(prompt, options);
         let client = reqwest::blocking::Client::new();
@@ -71,8 +71,8 @@ impl Text2ImageEndpoint {
     ///async invoke
     pub async fn ainvoke(
         &self,
-        prompt: String,
-        options: Vec<Text2ImageOpt>,
+        prompt: &str,
+        options: &Vec<Text2ImageOpt>,
     ) -> Result<Text2ImageResponse, ErnieError> {
         let body = Text2ImageEndpoint::generate_body(prompt, options);
         let client = reqwest::Client::new();

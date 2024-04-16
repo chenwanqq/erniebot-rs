@@ -27,8 +27,8 @@ impl EmbeddingEndpoint {
     /// sync invoke
     pub fn invoke(
         &self,
-        input: Vec<String>,
-        user_id: Option<String>,
+        input: &Vec<String>,
+        user_id: Option<&str>,
     ) -> Result<EmbeddingResponse, ErnieError> {
         let mut body = serde_json::json!({
             "input": input,
@@ -56,8 +56,8 @@ impl EmbeddingEndpoint {
     ///async invoke
     pub async fn ainvoke(
         &self,
-        input: Vec<String>,
-        user_id: Option<String>,
+        input: &Vec<String>,
+        user_id: Option<&str>,
     ) -> Result<EmbeddingResponse, ErnieError> {
         let mut body = serde_json::json!({
             "input": input,
