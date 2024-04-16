@@ -38,8 +38,8 @@ impl ChatEndpoint {
     }
 
     fn generate_body(
-        messages: Vec<Message>,
-        options: Vec<ChatOpt>,
+        messages: &Vec<Message>,
+        options: &Vec<ChatOpt>,
         stream: bool,
     ) -> Result<serde_json::Value, ErnieError> {
         let mut body = serde_json::json!({
@@ -64,8 +64,8 @@ impl ChatEndpoint {
     /// invoke method is used to send a request to erniebot chat endpoint. This is a blocking method that will return a full response from the chat endpoint
     pub fn invoke(
         &self,
-        messages: Vec<Message>,
-        options: Vec<ChatOpt>,
+        messages: &Vec<Message>,
+        options: &Vec<ChatOpt>,
     ) -> Result<Response, ErnieError> {
         let body = ChatEndpoint::generate_body(messages, options, false)?;
         let client = reqwest::blocking::Client::new();
@@ -88,8 +88,8 @@ impl ChatEndpoint {
     /// stream method is used to send a request to erniebot chat endpoint. This is a blocking method that will return response in multiple chunks from the chat endpoint
     pub fn stream(
         &self,
-        messages: Vec<Message>,
-        options: Vec<ChatOpt>,
+        messages: &Vec<Message>,
+        options: &Vec<ChatOpt>,
     ) -> Result<Responses, ErnieError> {
         let body = ChatEndpoint::generate_body(messages, options, true)?;
         let client = reqwest::blocking::Client::new();
@@ -102,15 +102,15 @@ impl ChatEndpoint {
             .map_err(|e| ErnieError::StreamError(e.to_string()))?
             .text()
             .map_err(|e| ErnieError::StreamError(e.to_string()))?;
-        let response = Responses::from_text(response)?;
+        let response = Responses::from_text(&response)?;
         Ok(response)
     }
 
     /// ainvoke method is used to send a request to erniebot chat endpoint. This is an async method that will return a full response from the chat endpoint
     pub async fn ainvoke(
         &self,
-        messages: Vec<Message>,
-        options: Vec<ChatOpt>,
+        messages: &Vec<Message>,
+        options: &Vec<ChatOpt>,
     ) -> Result<Response, ErnieError> {
         let body = ChatEndpoint::generate_body(messages, options, false)?;
         let client = reqwest::Client::new();
@@ -136,8 +136,8 @@ impl ChatEndpoint {
     /// astream method is used to send a request to erniebot chat endpoint. This is an async method that will return response in multiple chunks from the chat endpoint
     pub async fn astream(
         &self,
-        messages: Vec<Message>,
-        options: Vec<ChatOpt>,
+        messages: &Vec<Message>,
+        options: &Vec<ChatOpt>,
     ) -> Result<StreamResponse, ErnieError> {
         let body = ChatEndpoint::generate_body(messages, options, true)?;
         let client = reqwest::Client::new();
@@ -191,7 +191,7 @@ mod tests {
             ChatOpt::TopP(0.5),
             ChatOpt::TopK(50),
         ];
-        let result = ChatEndpoint::generate_body(messages, options, true).unwrap();
+        let result = ChatEndpoint::generate_body(&messages, &options, true).unwrap();
         let s = serde_json::to_string(&result).unwrap();
         println!("{}", s);
     }

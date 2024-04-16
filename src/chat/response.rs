@@ -82,7 +82,7 @@ pub struct Responses {
 
 impl Responses {
     /// get Responses from reqwest::blocking::client. In the response body, it contains multiple responses split by blank line. This method will parse the response body and return a Responses struct.
-    pub fn from_text(text: String) -> Result<Self, ErnieError> {
+    pub fn from_text(text: &str) -> Result<Self, ErnieError> {
         let parts = text.split("\n\n").collect::<Vec<&str>>();
         let mut result = Vec::new();
         for part in parts {

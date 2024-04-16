@@ -46,7 +46,7 @@ fn main() {
     let functions = vec![weather_function];
     let options = vec![ChatOpt::Functions(functions)];
     let chat = ChatEndpoint::new(ChatModel::ErnieBot).unwrap();
-    let response = chat.invoke(messages, options).unwrap();
+    let response = chat.invoke(&messages, &options).unwrap();
     let text_response = response.get_chat_result().unwrap();
     let function_call = response.get_function_call().unwrap();
     println!("text_response: {}", text_response);

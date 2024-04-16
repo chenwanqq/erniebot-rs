@@ -18,7 +18,7 @@ fn test_invoke() {
         ChatOpt::TopP(0.5),
         ChatOpt::TopK(50),
     ];
-    let response = chat.invoke(messages, options).unwrap();
+    let response = chat.invoke(&messages, &options).unwrap();
     let result = response.get_chat_result().unwrap();
     println!("{}", result);
 }
@@ -37,7 +37,7 @@ fn test_stream() {
         ChatOpt::TopP(0.5),
         ChatOpt::TopK(50),
     ];
-    let response = chat.stream(messages, options).unwrap();
+    let response = chat.stream(&messages, &options).unwrap();
     let result_by_chunk = response.get_results().unwrap();
     println!("{:?}", result_by_chunk);
     let whole_result = response.get_whole_result().unwrap();
@@ -55,7 +55,7 @@ fn test_ainvoke() {
         ];
     let options = Vec::new();
     let rt = Runtime::new().unwrap();
-    let response = rt.block_on(chat.ainvoke(messages, options)).unwrap();
+    let response = rt.block_on(chat.ainvoke(&messages, &options)).unwrap();
     let result = response.get_chat_result().unwrap();
     println!("{}", result);
 }
@@ -72,7 +72,7 @@ fn test_astream() {
     let options = Vec::new();
     let rt = Runtime::new().unwrap();
     rt.block_on(async move {
-        let mut stream_response = chat.astream(messages, options).await.unwrap();
+        let mut stream_response = chat.astream(&messages, &options).await.unwrap();
         while let Some(response) = stream_response.next().await {
             let result = response.get_chat_result().unwrap();
             print!("{}", result);
@@ -93,7 +93,7 @@ fn test_custom_endpoint() {
             },
         ];
     let options = Vec::new();
-    let response = chat.invoke(messages, options).unwrap();
+    let response = chat.invoke(&messages, &options).unwrap();
     let result = response.get_chat_result().unwrap();
     println!("{}", result);
 }

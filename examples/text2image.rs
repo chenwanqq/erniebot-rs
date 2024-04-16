@@ -7,7 +7,7 @@ fn main() {
         Text2ImageOpt::Style(Style::DigitalArt),
         Text2ImageOpt::Size(Size::S1024x768),
     ];
-    let text2image_response = text2image.invoke(prompt, options).unwrap();
+    let text2image_response = text2image.invoke(&prompt, &options).unwrap();
     let image_results = text2image_response.get_image_results().unwrap();
     for (index, image_string) in image_results.into_iter().enumerate() {
         let image = base64_to_image(image_string).unwrap();
