@@ -11,6 +11,7 @@ static EMBEDDING_BASE_URL: &str =
 
 /** ChatEndpoint is a struct that represents the chat endpoint of erniebot API
 */
+#[derive(Debug, Clone)]
 pub struct EmbeddingEndpoint {
     url: Url,
     access_token: String,

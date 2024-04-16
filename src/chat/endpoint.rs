@@ -15,6 +15,7 @@ static CHAT_API_URL: &str = "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxi
 
 /** ChatEndpoint is a struct that represents the chat endpoint of erniebot API
 */
+#[derive(Debug, Clone)]
 pub struct ChatEndpoint {
     url: Url,
     access_token: String,

@@ -11,6 +11,7 @@ use crate::utils::{build_url, get_access_token};
 static TEXT2IMAGE_BASE_URL: &str =
     "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/text2image/";
 /// Text2ImageEndpoint is a struct that represents the text2image endpoint of erniebot API
+#[derive(Debug, Clone)]
 pub struct Text2ImageEndpoint {
     url: Url,
     access_token: String,
