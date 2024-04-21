@@ -51,16 +51,12 @@ impl Text2ImageEndpoint {
         options: &Vec<Text2ImageOpt>,
     ) -> Result<Text2ImageResponse, ErnieError> {
         let body = Text2ImageEndpoint::generate_body(prompt, options);
-        let client = reqwest::blocking::Client::new();
-        let response: Value = client
-            .post(self.url.as_str())
-            .query(&[("access_token", self.access_token.as_str())])
-            .json(&body)
-            .send()
+        let response: Value = ureq::post(self.url.as_str())
+            .query("access_token", self.access_token.as_str())
+            .send_json(body)
             .map_err(|e| ErnieError::InvokeError(e.to_string()))?
-            .json()
+            .into_json()
             .map_err(|e| ErnieError::InvokeError(e.to_string()))?;
-
         //if error_code key in response, means RemoteAPIError
         if response.get("error_code").is_some() {
             return Err(ErnieError::RemoteAPIError(response.to_string()));

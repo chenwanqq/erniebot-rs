@@ -37,14 +37,11 @@ impl EmbeddingEndpoint {
         if let Some(user_id) = user_id {
             body.merge(&serde_json::json!({"user_id": user_id}));
         }
-        let client = reqwest::blocking::Client::new();
-        let response: Value = client
-            .post(self.url.as_str())
-            .query(&[("access_token", self.access_token.as_str())])
-            .json(&body)
-            .send()
+        let response: Value = ureq::post(self.url.as_str())
+            .query("access_token", self.access_token.as_str())
+            .send_json(body)
             .map_err(|e| ErnieError::InvokeError(e.to_string()))?
-            .json()
+            .into_json()
             .map_err(|e| ErnieError::InvokeError(e.to_string()))?;
 
         //if error_code key in response, means RemoteAPIError

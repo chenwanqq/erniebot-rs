@@ -11,20 +11,14 @@ pub fn get_access_token() -> Result<String, ErnieError> {
         .map_err(|_| ErnieError::GetAccessTokenError("QIANFAN_AK is not set".to_string()))?;
     let sk = var("QIANFAN_SK")
         .map_err(|_| ErnieError::GetAccessTokenError("QIANFAN_SK is not set".to_string()))?;
-
-    let client = reqwest::blocking::Client::new();
-    let res: Value = client
-        .post(url)
-        .query(&[
-            ("grant_type", "client_credentials"),
-            ("client_id", ak.as_str()),
-            ("client_secret", sk.as_str()),
-        ])
-        .send()
+    let res: Value = ureq::post(url)
+        .query("grant_type", "client_credentials")
+        .query("client_id", ak.as_str())
+        .query("client_secret", sk.as_str())
+        .call()
         .map_err(|e| ErnieError::GetAccessTokenError(e.to_string()))?
-        .json()
+        .into_json()
         .map_err(|e| ErnieError::GetAccessTokenError(e.to_string()))?;
-
     if let Some(error) = res.get("error") {
         let error_description = res.get("error_description").unwrap();
         Err(ErnieError::GetAccessTokenError(format!(

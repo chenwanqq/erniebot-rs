@@ -69,15 +69,12 @@ impl ChatEndpoint {
         options: &Vec<ChatOpt>,
     ) -> Result<Response, ErnieError> {
         let body = ChatEndpoint::generate_body(messages, options, false)?;
-        let client = reqwest::blocking::Client::new();
-        let response: Value = client
-            .post(self.url.as_str())
-            .header("Content-Type", "application/json")
-            .query(&[("access_token", self.access_token.as_str())])
-            .json(&body)
-            .send()
+        let response: Value = ureq::post(self.url.as_str())
+            .set("Content-Type", "application/json")
+            .query("access_token", self.access_token.as_str())
+            .send_json(body)
             .map_err(|e| ErnieError::InvokeError(e.to_string()))?
-            .json()
+            .into_json()
             .map_err(|e| ErnieError::InvokeError(e.to_string()))?;
 
         //if error_code key in response, means RemoteAPIError
@@ -93,16 +90,13 @@ impl ChatEndpoint {
         options: &Vec<ChatOpt>,
     ) -> Result<Responses, ErnieError> {
         let body = ChatEndpoint::generate_body(messages, options, true)?;
-        let client = reqwest::blocking::Client::new();
-        let response = client
-            .post(self.url.as_str())
-            .header("Content-Type", "application/json")
-            .query(&[("access_token", self.access_token.as_str())])
-            .json(&body)
-            .send()
-            .map_err(|e| ErnieError::StreamError(e.to_string()))?
-            .text()
-            .map_err(|e| ErnieError::StreamError(e.to_string()))?;
+        let response: String = ureq::post(self.url.as_str())
+            .set("Content-Type", "application/json")
+            .query("access_token", self.access_token.as_str())
+            .send_json(body)
+            .map_err(|e| ErnieError::InvokeError(e.to_string()))?
+            .into_string()
+            .map_err(|e| ErnieError::InvokeError(e.to_string()))?;
         let response = Responses::from_text(&response)?;
         Ok(response)
     }

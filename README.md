@@ -3,6 +3,7 @@
 Unofficial Baidu Ernie(Wenxin Yiyan, Qianfan) Rust SDK, currently supporting three modules: chat, text embedding (embedding), and text-to-image generation (text2image).
 
 **update in 2024/04/09**: Add support for the bce-reranker-base-v1 rerank model
+**update in 2024/04/21** For sync mode, use ureq instead of reqwest_blocking, hence it can improve the compatibility with tokio.
 
 ## Installation
 
@@ -10,7 +11,7 @@ Add the following to your Cargo.toml file:
 
 ```toml
 [dependencies]
-erniebot-rs = "0.3.2"
+erniebot-rs = "0.4.1"
 ```
 
 ## Authentication
@@ -45,7 +46,7 @@ fn test_invoke() {
         ChatOpt::TopP(0.5),  
         ChatOpt::TopK(50),  
     ];  
-    let response = chat.invoke(messages, options).unwrap();  
+    let response = chat.invoke(&messages, &options).unwrap();  
     let result = response.get_chat_result().unwrap();  
     println!("{}", result);  
 }
@@ -64,7 +65,7 @@ fn test_custom_endpoint() {
         },  
     ];  
     let options = Vec::new();  
-    let response = chat.invoke(messages, options).unwrap();  
+    let response = chat.invoke(&messages, &options).unwrap();  
     let result = response.get_chat_result().unwrap();  
     println!("{}", result);  
 }
@@ -87,7 +88,7 @@ fn test_astream() {
     let options = Vec::new();  
     let rt = Runtime::new().unwrap();  
     rt.block_on(async move {  
-        let mut stream_response = chat.astream(messages, options).await.unwrap();  
+        let mut stream_response = chat.astream(&messages, &options).await.unwrap();  
         while let Some(response) = stream_response.next().await {  
             let result = response.get_chat_result().unwrap();  
             print!("{}", result);  
@@ -123,7 +124,7 @@ fn test_async_embedding() {
         "你是谁".to_string(),  
     ];  
     let rt = Runtime::new().unwrap();  
-    let embedding_response = rt.block_on(embedding.ainvoke(input, None)).unwrap();  
+    let embedding_response = rt.block_on(embedding.ainvoke(&input, None)).unwrap();  
     let embedding_results = embedding_response.get_embedding_results().unwrap();  
     println!("{},{}", embedding_results.len(), embedding_results[0].len());  
 }
@@ -141,7 +142,7 @@ fn main() {
         Text2ImageOpt::Style(Style::DigitalArt),
         Text2ImageOpt::Size(Size::S1024x768),
     ];
-    let text2image_response = text2image.invoke(prompt, options).unwrap();
+    let text2image_response = text2image.invoke(&prompt, &options).unwrap();
     let image_results = text2image_response.get_image_results().unwrap();
     for (index, image_string) in image_results.into_iter().enumerate() {
         let image = base64_to_image(image_string).unwrap();
