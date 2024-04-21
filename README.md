@@ -3,6 +3,7 @@
 Unofficial Baidu Ernie(Wenxin Yiyan, Qianfan) Rust SDK, currently supporting three modules: chat, text embedding (embedding), and text-to-image generation (text2image).
 
 **update in 2024/04/09**: Add support for the bce-reranker-base-v1 rerank model
+
 **update in 2024/04/21** For sync mode, use ureq instead of reqwest_blocking, hence it can improve the compatibility with tokio.
 
 ## Installation
